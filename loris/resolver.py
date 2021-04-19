@@ -41,6 +41,7 @@ class _AbstractResolver:
 
             self.auth_rules_ext = self.config.get('auth_rules_ext', 'rules.json')
             self.use_auth_rules = self.config.get('use_auth_rules', False)
+            self.img_ext = self.config.get('img_ext', '')
 
     def is_resolvable(self, ident):
         """
@@ -102,6 +103,8 @@ class _AbstractResolver:
             if len(extension) < 5:
                 extension = extension.lower()
                 return constants.EXTENSION_MAP.get(extension, extension)
+        else:
+            return self.img_ext
         raise ResolverException(
             "Format could not be determined for %r." % ident
         )
@@ -135,7 +138,13 @@ class SimpleFSResolver(_AbstractResolver):
     def is_resolvable(self, ident):
         return not self.source_file_path(ident) is None
 
+    def has_extension(self, ident):
+        return True if ident.rfind('.') != -1 else False
+
     def resolve(self, app, ident, base_uri):
+        if not self.has_extension(ident):
+            ident = ident + '.' + self.config['img_ext']
+            
         if not self.is_resolvable(ident):
             self.raise_404_for_ident(ident)
 

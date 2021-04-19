@@ -451,6 +451,9 @@ class Loris:
         base_uri = loris_request.base_uri
 
         if request_type == 'redirect_info':
+            if not self.resolver.has_extension(ident):
+                ident = ident + '.' + self.app_configs['resolver']['img_ext']
+
             if not self.resolver.is_resolvable(ident):
                 msg = "could not resolve identifier: %s " % (ident)
                 return NotFoundResponse(msg)
